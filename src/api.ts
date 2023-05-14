@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import AmikomParking from './routes/amikom_parking';
 
 export const app = express();
 
@@ -16,25 +15,5 @@ app.get('/', (req, res) => {
   res.status(200).send({ status: 'ok' });
 });
 
-const api = express.Router();
-
-api.get('/hello', async (req, res) => {
-  const tes = await prisma.user.findMany();
-  console.log('🚀 ~ file: api.ts:25 ~ api.get ~ tes:', tes);
-  res.status(200).send({ message: 'hello world' });
-});
-
-api.get('/create', async (req, res) => {
-  const tes = await prisma.user.create({
-    data: {
-      nama: 'Ardian Eka Candra',
-      nim: '17.11.1768',
-      pass: '20032'
-    }
-  });
-  console.log('🚀 ~ file: api.ts:25 ~ api.get ~ tes:', tes);
-  res.status(200).send({ message: 'creating' });
-});
-
-// Version the api
-app.use('/api/v1', api);
+// Amikom Parking router
+app.use('/api/amikom_parking', AmikomParking);
