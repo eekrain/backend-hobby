@@ -1,6 +1,7 @@
 import Express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { TypedRequestBody } from '../types';
+import { verifyPassword } from '../utils/hash';
 
 const prisma = new PrismaClient();
 const AmikomParking = Express.Router();
@@ -11,12 +12,20 @@ AmikomParking.post(
     const { nim, pass } = req.body;
     const user = await prisma.user.findFirst({
       where: {
-        nim,
-        pass
+        nim
       }
     });
-    console.log('🚀 ~ file: amikom_parking.ts:18 ~ user:', user);
-    if (user) {
+
+    if (!user) {
+      console.error('Log In failed, user not found');
+      return res.status(401).send({
+        status: false,
+        message: 'Gagal Log In!'
+      });
+    }
+    const passwordCorrect = await verifyPassword(user.pass, pass);
+
+    if (passwordCorrect) {
       return res.status(200).send({
         status: true,
         message: 'Berhasil Log In!',
@@ -24,6 +33,7 @@ AmikomParking.post(
       });
     }
 
+    console.error('Log In failed, wrong password');
     return res.status(401).send({
       status: false,
       message: 'Gagal Log In!'

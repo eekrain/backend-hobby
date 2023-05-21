@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { generatePassword } from '../src/utils/hash';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -15,23 +17,29 @@ main()
   });
 
 async function user() {
-  const alice = await prisma.user.upsert({
-    where: { nim: '17.11.1768' },
-    update: {},
-    create: {
-      nim: '17.11.1768',
-      nama: 'Ardian Eka Candra',
-      pass: '20032'
-    }
+  let eka = {
+    nim: '17.11.1768',
+    nama: 'Ardian Eka Candra',
+    pass: '20032'
+  };
+  let irfan = {
+    nim: '17.11.1738',
+    nama: 'Irfan Maulana',
+    pass: '20032'
+  };
+
+  eka.pass = await generatePassword(eka.pass);
+  irfan.pass = await generatePassword(irfan.pass);
+
+  const a = await prisma.user.upsert({
+    where: { nim: eka.nim },
+    update: eka,
+    create: eka
   });
-  const bob = await prisma.user.upsert({
-    where: { nim: '17.11.1738' },
-    update: {},
-    create: {
-      nim: '17.11.1738',
-      nama: 'Irfan Maulana',
-      pass: '20032'
-    }
+  const b = await prisma.user.upsert({
+    where: { nim: irfan.nim },
+    update: irfan,
+    create: irfan
   });
-  console.log({ alice, bob });
+  console.log({ a, b });
 }
