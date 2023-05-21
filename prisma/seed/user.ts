@@ -1,5 +1,5 @@
+import { seedPrismaClient } from '.';
 import { generatePassword } from '../../src/utils/hash';
-import { seedPrismaClient } from '../seed';
 
 export const user = async () => {
   let eka = {
