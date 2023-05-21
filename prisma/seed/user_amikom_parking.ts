@@ -1,7 +1,7 @@
 import { seedPrismaClient } from '.';
 import { generatePassword } from '../../src/utils/hash';
 
-export const user = async () => {
+export const user_amikom_parking = async () => {
   let eka = {
     nim: '17.11.1768',
     nama: 'Ardian Eka Candra',

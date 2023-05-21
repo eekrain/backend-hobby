@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import { user } from './user';
+import { user_amikom_parking } from './user_amikom_parking';
 
 export const seedPrismaClient = new PrismaClient();
 
 async function main() {
-  await user();
+  await user_amikom_parking();
 }
 
 main()
