@@ -2,14 +2,18 @@ import Express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { TypedRequestBody } from '../types';
 import { verifyPassword } from '../utils/hash';
+import MY_ERRORS from '../utils/errors';
 
 const prisma = new PrismaClient();
 const AmikomParking = Express.Router();
 
 AmikomParking.post(
-  '/auth',
+  '/user/auth',
   async (req: TypedRequestBody<{ nim: string; pass: string }>, res) => {
     const { nim, pass } = req.body;
+    if (typeof nim !== 'string' && typeof pass !== 'string') {
+      return MY_ERRORS.BAD_REQUEST_400(res);
+    }
     const user = await prisma.user.findFirst({
       where: {
         nim
@@ -18,10 +22,7 @@ AmikomParking.post(
 
     if (!user) {
       console.error('Log In failed, user not found');
-      return res.status(401).send({
-        status: false,
-        message: 'Gagal Log In!'
-      });
+      return MY_ERRORS.UNAUTHORIZED_401(res);
     }
     const passwordCorrect = await verifyPassword(user.pass, pass);
 
@@ -34,17 +35,28 @@ AmikomParking.post(
     }
 
     console.error('Log In failed, wrong password');
-    return res.status(401).send({
-      status: false,
-      message: 'Gagal Log In!'
-    });
+    return MY_ERRORS.UNAUTHORIZED_401(res);
   }
 );
 
-AmikomParking.get('/listUser', async (req, res: Express.Response) => {
-  const tes = await prisma.user.findMany();
-  console.log('🚀 ~ file: api.ts:25 ~ api.get ~ tes:', tes);
-  res.status(200).send({ message: 'hello world' });
+AmikomParking.post('/user/getVehicles', async (req, res: Express.Response) => {
+  const { nim } = req.body;
+
+  if (typeof nim !== 'string') {
+    return MY_ERRORS.BAD_REQUEST_400(res);
+  }
+
+  const vehicles = await prisma.vehicle.findMany({ where: { userNim: nim } });
+  res.status(200).send(vehicles);
+});
+
+AmikomParking.get('/user/listUser', async (req, res: Express.Response) => {
+  const users = await prisma.user.findMany();
+  console.log(
+    '🚀 ~ file: amikom_parking.ts:55 ~ AmikomParking.get ~ users:',
+    users
+  );
+  res.status(200).send(users);
 });
 
 export default AmikomParking;

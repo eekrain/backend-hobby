@@ -13,7 +13,22 @@ datasource db {
 }
 
 model User {
-  nim  String @id
-  nama String
-  pass String
+  nim      String    @id
+  nama     String
+  pass     String
+  vehicles Vehicle[]
+}
+
+model Vehicle {
+  plat    String       @id
+  jenis   JenisVehicle
+  merk    String
+  tipe    String
+  User    User?        @relation(fields: [userNim], references: [nim])
+  userNim String?
+}
+
+enum JenisVehicle {
+  MOTOR
+  MOBIL
 }
