@@ -16,6 +16,7 @@ model User {
   nim      String    @id
   nama     String
   pass     String
+  foto     String    @default("https://randomuser.me/api/portraits/men/32.jpg")
   vehicles Vehicle[]
 }
 

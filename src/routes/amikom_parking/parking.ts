@@ -36,15 +36,38 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
     );
   }
 
+  const user = await prisma.user.findFirst({
+    where: {
+      nim,
+    },
+    include: {
+      vehicles: true,
+    },
+  });
+  const currVehicle = user?.vehicles.find((val) => val.plat === plat);
+
+  if (!user) {
+    return MY_ERRORS.UNAUTHORIZED_401(
+      res,
+      `User dengan nim ${nim} tidak terdaftar. Mohon logout dan login kembali!`,
+    );
+  }
+  if (!currVehicle) {
+    return MY_ERRORS.UNAUTHORIZED_401(
+      res,
+      `Motor dengan plat ${plat} tidak terdaftar. Mohon restart aplikasi untuk sinkronisasi!`,
+    );
+  }
+
   res.status(200).send({
     status: true,
     message: 'Akses diterima. Hati-hati di jalan!',
-    plat: plat,
-    jenis: 'MOTOR',
-    merk: 'YAMAHA',
-    tipe: 'N-Max',
-    mhs_nama: 'Ardian Eka Candra',
-    mhs_foto: 'https://randomuser.me/api/portraits/men/32.jpg',
+    plat: currVehicle.plat,
+    jenis: currVehicle.jenis,
+    merk: currVehicle.merk,
+    tipe: currVehicle.tipe,
+    mhs_nama: user.nama,
+    mhs_foto: user.foto,
   });
 });
 
