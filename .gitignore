@@ -30,3 +30,6 @@ yarn-error.log*
 # out dir
 dist/
 .direnv
+
+combined.log
+error.log
