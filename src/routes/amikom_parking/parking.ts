@@ -61,7 +61,7 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
 
   res.status(200).send({
     status: true,
-    message: 'Akses diterima. Hati-hati di jalan!',
+    message: 'Data ditemukan.',
     plat: currVehicle.plat,
     jenis: currVehicle.jenis,
     merk: currVehicle.merk,
