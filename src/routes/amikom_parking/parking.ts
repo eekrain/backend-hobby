@@ -2,6 +2,7 @@ import Express from 'express';
 import { PrismaClient } from '@prisma/client';
 import MY_ERRORS from '../../utils/errors';
 import dayjs from 'dayjs';
+import { mySocket } from '../..';
 
 const prisma = new PrismaClient();
 const parkingRouter = Express.Router();
@@ -89,19 +90,32 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
     typeof status !== 'string' &&
     typeof date !== 'string'
   ) {
+    mySocket.io.emit('parking-status', {
+      status: false,
+      message: 'Error fetching.',
+    });
     return MY_ERRORS.BAD_REQUEST_400(res);
   }
 
   if (status !== '1') {
+    mySocket.io.emit('parking-status', {
+      status: false,
+      message: 'Request parkir ditolak!',
+    });
     return MY_ERRORS.UNAUTHORIZED_401(res, 'Request parkir ditolak!');
   }
 
-  const tes = await prisma.history.create({
+  await prisma.history.create({
     data: {
       mhs_nim: nim,
       plat,
       date: dayjs(date).toDate(),
     },
+  });
+
+  mySocket.io.emit('parking-status', {
+    status: true,
+    message: 'Akses diterima. Hati-hati di jalan!',
   });
 
   res.status(200).send({
