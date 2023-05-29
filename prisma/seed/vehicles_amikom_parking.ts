@@ -7,7 +7,7 @@ export const vehicles_amikom_parking = async () => {
     jenis: 'MOTOR',
     merk: 'YAMAHA',
     tipe: 'N-MAX',
-    userNim: '17.11.1768'
+    mhs_nim: '17.11.1768',
   };
 
   let irfan: Prisma.VehicleUncheckedCreateInput = {
@@ -15,19 +15,19 @@ export const vehicles_amikom_parking = async () => {
     jenis: 'MOTOR',
     merk: 'YAMAHA',
     tipe: 'JUPITER MX',
-    userNim: '17.11.1738'
+    mhs_nim: '17.11.1738',
   };
 
   const a = await seedPrismaClient.vehicle.upsert({
     where: { plat: eka.plat },
     update: eka,
-    create: eka
+    create: eka,
   });
 
   const b = await seedPrismaClient.vehicle.upsert({
     where: { plat: irfan.plat },
     update: irfan,
-    create: irfan
+    create: irfan,
   });
   console.log({ a, b });
 };

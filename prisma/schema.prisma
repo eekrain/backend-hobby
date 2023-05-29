@@ -13,11 +13,12 @@ datasource db {
 }
 
 model User {
-  nim      String    @id
-  nama     String
-  pass     String
-  foto     String    @default("https://randomuser.me/api/portraits/men/32.jpg")
-  vehicles Vehicle[]
+  nim            String    @id
+  nama           String
+  pass           String
+  foto           String    @default("https://randomuser.me/api/portraits/men/32.jpg")
+  vehicles       Vehicle[]
+  parkingHistory History[]
 }
 
 model Vehicle {
@@ -25,11 +26,19 @@ model Vehicle {
   jenis   JenisVehicle
   merk    String
   tipe    String
-  User    User?        @relation(fields: [userNim], references: [nim])
-  userNim String?
+  User    User?        @relation(fields: [mhs_nim], references: [nim])
+  mhs_nim String?
 }
 
 enum JenisVehicle {
   MOTOR
   MOBIL
+}
+
+model History {
+  id      Int      @id @default(autoincrement())
+  mhs_nim String?
+  User    User?    @relation(fields: [mhs_nim], references: [nim])
+  plat    String
+  date    DateTime
 }

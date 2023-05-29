@@ -16,8 +16,8 @@ userRouter.post(
     }
     const user = await prisma.user.findFirst({
       where: {
-        nim
-      }
+        nim,
+      },
     });
 
     if (!user) {
@@ -30,13 +30,13 @@ userRouter.post(
       return res.status(200).send({
         status: true,
         message: 'Berhasil Log In!',
-        nama: user.nama
+        nama: user.nama,
       });
     }
 
     console.error('Log In failed, wrong password');
     return MY_ERRORS.UNAUTHORIZED_401(res);
-  }
+  },
 );
 
 userRouter.post('/getVehicles', async (req, res: Express.Response) => {
@@ -46,7 +46,7 @@ userRouter.post('/getVehicles', async (req, res: Express.Response) => {
     return MY_ERRORS.BAD_REQUEST_400(res);
   }
 
-  const vehicles = await prisma.vehicle.findMany({ where: { userNim: nim } });
+  const vehicles = await prisma.vehicle.findMany({ where: { mhs_nim: nim } });
   res.status(200).send(vehicles);
 });
 
@@ -54,7 +54,7 @@ userRouter.get('/listUser', async (req, res: Express.Response) => {
   const users = await prisma.user.findMany();
   console.log(
     '🚀 ~ file: amikom_parking.ts:55 ~ AmikomParking.get ~ users:',
-    users
+    users,
   );
   res.status(200).send(users);
 });
