@@ -7,8 +7,12 @@ const prisma = new PrismaClient();
 const parkingRouter = Express.Router();
 const WEB_ADMIN_QRKEY = process.env.WEB_ADMIN_QRKEY;
 
-parkingRouter.post('/processParking', async (req, res: Express.Response) => {
-  const { nim, plat, qrcode } = req.body;
+parkingRouter.post('/checkQR', async (req, res: Express.Response) => {
+  const { nim, plat, qrcode } = req.body as {
+    nim: string;
+    plat: string;
+    qrcode: string;
+  };
   const { key, validUntil } = JSON.parse(qrcode);
 
   if (
@@ -61,7 +65,7 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
 
   res.status(200).send({
     status: true,
-    message: 'Akses diterima. Hati-hati di jalan!',
+    message: 'QR valid.',
     plat: currVehicle.plat,
     jenis: currVehicle.jenis,
     merk: currVehicle.merk,
@@ -69,6 +73,60 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
     mhs_nama: user.nama,
     mhs_foto: user.foto,
   });
+});
+
+parkingRouter.post('/processParking', async (req, res: Express.Response) => {
+  const { nim, plat, status, date } = req.body as {
+    nim: string;
+    plat: string;
+    status: string;
+    date: string;
+  };
+
+  if (
+    typeof nim !== 'string' &&
+    typeof plat !== 'string' &&
+    typeof status !== 'string' &&
+    typeof date !== 'string'
+  ) {
+    return MY_ERRORS.BAD_REQUEST_400(res);
+  }
+
+  if (status !== '1') {
+    return MY_ERRORS.UNAUTHORIZED_401(res, 'Request parkir ditolak!');
+  }
+
+  const tes = await prisma.history.create({
+    data: {
+      mhs_nim: nim,
+      plat,
+      date: dayjs(date).toDate(),
+    },
+  });
+
+  res.status(200).send({
+    status: true,
+    message: 'Akses diterima. Hati-hati di jalan!',
+  });
+});
+
+parkingRouter.get('/history', async (req, res: Express.Response) => {
+  let { limit } = req.query as { limit?: 'all' | '1d' };
+  if (!limit) limit = 'all';
+  if (limit != 'all' && limit != '1d') return MY_ERRORS.BAD_REQUEST_400(res);
+
+  const history = await prisma.history.findMany({
+    orderBy: {
+      date: 'desc',
+    },
+    where: {
+      date: {
+        gte: limit === '1d' ? dayjs().startOf('day').toDate() : undefined,
+      },
+    },
+  });
+
+  res.status(200).send(history);
 });
 
 export default parkingRouter;

@@ -10,8 +10,8 @@
     "start": "node dist/index.js",
     "prisma:push": "prisma db push",
     "prisma:status": "prisma migrate status",
-    "generate": "prisma generate",
-    "seed": "ts-node prisma/seed/index.ts"
+    "prisma:seed": "ts-node prisma/seed/index.ts",
+    "generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "4.13.0",
