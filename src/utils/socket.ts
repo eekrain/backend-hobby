@@ -17,7 +17,9 @@ export class ServerSocket {
       cookie: false,
       cors: {
         origin:
-          process.env.NODE_ENV === 'production' ? 'http://yourdomain.com' : '*',
+          process.env.NODE_ENV === 'production'
+            ? process.env.WEB_ORIGIN_URL || 'http://localhost:3000'
+            : '*',
       },
     });
 
