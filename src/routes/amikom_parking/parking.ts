@@ -1,12 +1,16 @@
 import Express from 'express';
 import { PrismaClient } from '@prisma/client';
 import MY_ERRORS from '../../utils/errors';
-import dayjs from 'dayjs';
 import { mySocket } from '../..';
-
 const prisma = new PrismaClient();
 const parkingRouter = Express.Router();
 const WEB_ADMIN_QRKEY = process.env.WEB_ADMIN_QRKEY;
+
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 parkingRouter.post('/checkQR', async (req, res: Express.Response) => {
   const { nim, plat, qrcode } = req.body as {
@@ -96,6 +100,7 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
     });
     return MY_ERRORS.BAD_REQUEST_400(res);
   }
+  console.log('🚀 ~ file: parking.ts:97 ~ parkingRouter.post ~ date:', date);
 
   if (status !== '1') {
     mySocket.io.emit('parking-status', {
@@ -109,7 +114,7 @@ parkingRouter.post('/processParking', async (req, res: Express.Response) => {
     data: {
       mhs_nim: nim,
       plat,
-      date: dayjs(date).toDate(),
+      date: dayjs(date).tz('Asia/Jakarta').toDate(),
     },
   });
 
@@ -131,11 +136,14 @@ parkingRouter.get('/history', async (req, res: Express.Response) => {
 
   const history = await prisma.history.findMany({
     orderBy: {
-      date: 'desc',
+      date: 'asc',
     },
     where: {
       date: {
-        gte: limit === '1d' ? dayjs().startOf('day').toDate() : undefined,
+        gte:
+          limit === '1d'
+            ? dayjs().tz('Asia/Jakarta').startOf('day').toDate()
+            : undefined,
       },
     },
   });
