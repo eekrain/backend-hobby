@@ -39,14 +39,15 @@ userRouter.post(
   },
 );
 
-userRouter.post('/getVehicles', async (req, res: Express.Response) => {
-  const { nim } = req.body;
+userRouter.get('/vehicles', async (req, res: Express.Response) => {
+  const { nim } = req.query as { nim?: string };
 
   if (typeof nim !== 'string') {
     return MY_ERRORS.BAD_REQUEST_400(res);
   }
 
   const vehicles = await prisma.vehicle.findMany({ where: { mhs_nim: nim } });
+  console.log('🚀 ~ file: user.ts:50 ~ userRouter.post ~ vehicles:', vehicles);
   res.status(200).send(vehicles);
 });
 
